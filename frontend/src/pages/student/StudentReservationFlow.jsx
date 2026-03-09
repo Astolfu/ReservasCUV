@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import CalendarGrid from '../../components/CalendarGrid';
-import { Calendar, Clock, MapPin, Users, CheckCircle, Search } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, CheckCircle, Search, ArrowLeft, Info } from 'lucide-react';
 import API_BASE_URL from '../../api';
 
 const StudentReservationFlow = () => {
@@ -22,7 +22,7 @@ const StudentReservationFlow = () => {
 
     useEffect(() => {
         const fetchSpaces = async () => {
-            const res = await fetch('http://localhost:3000/api/spaces');
+            const res = await fetch(`${API_BASE_URL}/api/spaces`);
             setSpaces(await res.json());
         };
         fetchSpaces();
@@ -38,7 +38,7 @@ const StudentReservationFlow = () => {
         
         const fetchOccupied = async () => {
             try {
-                const res = await fetch(`http://localhost:3000/api/reservations/check?space_id=${selectedSpace.id}&date=${dateStr}`);
+                const res = await fetch(`${API_BASE_URL}/api/reservations/check?space_id=${selectedSpace.id}&date=${dateStr}`);
                 if (res.ok) {
                     setOccupiedTimes(await res.json());
                 }
@@ -110,7 +110,7 @@ const StudentReservationFlow = () => {
         const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
         
         try {
-            const res = await fetch('http://localhost:3000/api/reservations', {
+            const res = await fetch(`${API_BASE_URL}/api/reservations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

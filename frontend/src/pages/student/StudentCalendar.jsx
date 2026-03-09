@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarGrid } from '../../components/CalendarGrid';
+import CalendarGrid from '../../components/CalendarGrid';
 import API_BASE_URL from '../../api';
 import { Clock, MapPin, Search } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar as CalendarGrid } from '../../components/CalendarGrid';
+import CalendarGrid from '../../components/CalendarGrid';
 import API_BASE_URL from '../../api';
 import { CheckCircle, XCircle, Clock, MapPin, User, Plus } from 'lucide-react';
 
@@ -35,7 +35,7 @@ const AdminCalendar = () => {
 
     const handleStatus = async (id, status) => {
         try {
-            await fetch(`http://localhost:3000/api/reservations/${id}/status`, {
+            await fetch(`${API_BASE_URL}/api/reservations/${id}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })

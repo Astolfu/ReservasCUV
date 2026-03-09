@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Camera, MapPin, Users, Clock } from 'lucide-react';
 import API_BASE_URL from '../../api';
 
@@ -11,8 +12,8 @@ const Spaces = () => {
     const fetchData = async () => {
         try {
             const [spaceRes, mgrRes] = await Promise.all([
-                fetch('http://localhost:3000/api/spaces'),
-                fetch('http://localhost:3000/api/managers')
+                fetch(`${API_BASE_URL}/api/spaces`),
+                fetch(`${API_BASE_URL}/api/managers`)
             ]);
             setSpaces(await spaceRes.json());
             setManagers(await mgrRes.json());
@@ -41,7 +42,7 @@ const Spaces = () => {
         setLoading(true); setError('');
         try {
             const payload = { ...formData, manager_id: formData.manager_id || null };
-            const res = await fetch('http://localhost:3000/api/spaces', {
+            const res = await fetch(`${API_BASE_URL}/api/spaces`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
