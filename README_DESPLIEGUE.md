@@ -1,54 +1,54 @@
-# Guía de Despliegue en Hostinger - ReservasCUV
+# Guía de Despliegue Híbrido - ReservasCUV
 
-Este proyecto consta de un frontend en **React (Vite)** y un backend en **Node.js (Express)** con base de datos **MySQL**.
+Debido a que el plan Hostinger Premium no soporta Node.js directamente, usaremos una combinación ganadora: **Hostinger** para la web y la base de datos, y **Render** para el cerebro (backend).
 
-## 1. Configuración de la Base de Datos
-1. Accede al panel de Hostinger y crea una base de datos MySQL.
-2. Anota el **Nombre de la BD**, **Usuario** y **Contraseña**.
-3. Importa el archivo SQL (si tienes uno) o asegúrate de que las tablas existan con la estructura correcta.
+## 1. Base de Datos (En Hostinger)
+1. Ve al panel de Hostinger -> **Bases de Datos MySQL**.
+2. Crea una nueva base de datos y usuario. Anota los datos.
+3. **Paso Crucial:** Busca la opción **"MySQL Remoto"**.
+   - En "Hostname", pon el símbolo `%` (esto permite que Render se conecte).
+   - Elige la base de datos que creaste y dale a "Añadir".
+4. Usa "phpMyAdmin" para importar el archivo `backend/database.sql` que está en tu proyecto.
 
-## 2. Despliegue del Backend (Node.js)
-Hostinger permite usar un **Node.js Selector** en sus planes premium/business.
+## 2. El Backend (En Render.com)
+1. Crea una cuenta en [Render.com](https://render.com) y conecta tu GitHub.
+2. Crea un **New -> Web Service**.
+3. Selecciona tu repositorio `ReservasCUV`.
+4. Configura:
+   - **Root Directory:** `backend`
+   - **Runtime:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `node server.js`
+5. Ve a la pestaña **Environment** y añade estas variables:
+   - `DB_HOST`: La IP de tu servidor Hostinger (aparece en el panel de MySQL).
+   - `DB_USER`: Tu usuario de BD de Hostinger.
+   - `DB_PASSWORD`: Tu contraseña de BD.
+   - `DB_NAME`: El nombre de la BD.
+   - `DB_PORT`: `3306`
+6. Render te dará una URL (ej. `https://reservas-backend.onrender.com`). **Cópiala**.
 
-1. Sube el contenido de la carpeta `backend/` a una carpeta en tu servidor (ej. `/home/usuario/backend`).
-2. En el panel de Hostinger, busca "Node.js" y configura una nueva aplicación:
-   - **Versión de Node:** 18 o superior.
-   - **Application root:** La carpeta donde subiste el backend.
-   - **Application URL:** (ej. `api.tu-dominio.com` o una subcarpeta).
-   - **Startup file:** `server.js`.
-3. Crea un archivo `.env` en la carpeta del backend con tus credenciales de Hostinger:
-   ```env
-   DB_HOST=localhost (normalmente)
-   DB_USER=u123456789_user
-   DB_PASSWORD=tu_password
-   DB_NAME=u123456789_reserva_espacios
-   PORT=3000
-   ```
-4. Haz clic en "Run npm install" desde el panel de Hostinger para instalar las dependencias.
-
-## 3. Despliegue del Frontend (React)
-El frontend debe compilarse a archivos estáticos (HTML/JS/CSS).
-
-1. Abre una terminal en tu computadora dentro de la carpeta `frontend/`.
-2. **CONFIGURAR API:** Abre el archivo `src/api.js` y cambia la constante `API_BASE_URL` por la URL de tu backend en Hostinger (ej. `https://api.tu-dominio.com`).
-3. Ejecuta el comando:
+## 3. El Frontend (En Hostinger)
+1. En tu computadora, abre `frontend/src/api.js`.
+2. Pega la URL que te dio Render: `const API_BASE_URL = 'https://tu-url-de-render.com';`
+3. Abre una terminal en la carpeta `frontend/` y ejecuta:
    ```bash
    npm run build
    ```
-4. Esto generará una carpeta llamada `dist/`.
-5. Sube todo el contenido de `dist/` a la carpeta `public_html` de tu dominio principal (o donde desees que se vea la web).
+4. Se creará una carpeta `dist/`. Sube todo su contenido a la carpeta `public_html` de Hostinger usando el Administrador de Archivos o FTP.
 
-## 4. Notas Importantes
-- **CORS:** Si el frontend y el backend están en dominios o subdominios diferentes, el backend ya tiene habilitado CORS, pero asegúrate de que los dominios permitidos sean los correctos en `server.js`.
-- **Navegación (React Router):** Si las rutas del frontend fallan al recargar la página (Error 404), crea un archivo `.htaccess` en `public_html` con este contenido:
-  ```apache
-  <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-    RewriteRule ^index\.html$ - [L]
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-l
-    RewriteRule . /index.html [L]
-  </IfModule>
-  ```
+## 4. Archivo .htaccess (Para que no falle al recargar)
+Crea un archivo llamado `.htaccess` dentro de `public_html` en Hostinger con:
+```apache
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+```
+
+---
+**Nota:** El backend ya tiene configurado CORS para aceptar peticiones desde cualquier origen, por lo que no deberías tener problemas de conexión.
